@@ -17,7 +17,7 @@ class CompactUrlServiceTest {
 
     @Test
     void addAndFindSuccess() {
-        var compactUrl = compactUrlService.addUrl(GOOGLE);
+        var compactUrl = compactUrlService.addUrl(GOOGLE, "idempotenceKey");
         assertEquals(GOOGLE, compactUrl.getUrl());
         var originalUrl = compactUrlService.findById(compactUrl.getId());
         assertEquals(GOOGLE, originalUrl.get().getUrl());

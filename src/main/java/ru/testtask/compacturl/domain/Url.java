@@ -15,4 +15,6 @@ public class Url {
     private String id;
     @NotEmpty
     private String url;
+    @NotEmpty
+    private String idempotenceKey;
 }

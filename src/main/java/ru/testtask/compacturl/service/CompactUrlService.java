@@ -7,6 +7,7 @@ import ru.testtask.compacturl.domain.Url;
 import ru.testtask.compacturl.repository.UrlRepository;
 import ru.testtask.compacturl.util.IdGenerator;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,9 +23,17 @@ public class CompactUrlService {
         this.idGenerator = idGenerator;
     }
 
-    public Url addUrl(String originalUrl) {
+    public Url addUrl(String originalUrl, String idempotenceKey) {
+        List<Url> urls = urlRepository.findUrlByIdempotenceKey(idempotenceKey);
+        Optional<Url> optionalUrl= urls.stream()
+                .filter(url -> url.getUrl().equals(originalUrl))
+                .findAny();
+        return optionalUrl.orElseGet(() -> generateIdAndSave(originalUrl, idempotenceKey));
+    }
+
+    private Url generateIdAndSave(String originalUrl, String idempotenceKey) {
         String generatedId = idGenerator.generate();
-        Url url = new Url(generatedId, originalUrl);
+        Url url = new Url(generatedId, originalUrl, idempotenceKey);
         return urlRepository.save(url);
     }
 

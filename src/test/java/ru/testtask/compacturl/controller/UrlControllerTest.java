@@ -15,6 +15,8 @@ import ru.testtask.compacturl.service.CompactUrlService;
 
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UrlControllerTest {
@@ -43,7 +45,7 @@ class UrlControllerTest {
 
     @Test
     void requestExistingUrl() {
-        Url url = service.addUrl("http://google.com");
+        Url url = service.addUrl("http://google.com", "idempotenceKey");
 
         expect().statusCode(200)
                 .given()
@@ -58,6 +60,7 @@ class UrlControllerTest {
     void requestMakeCompactUrl() {
         given().port(port)
                 .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "idempotenceKey")
                 .body(new UrlDTO("http://google.com"))
                 .when()
                 .post("/")
@@ -70,12 +73,131 @@ class UrlControllerTest {
     void requestMakeInvalidUrl() {
         given().port(port)
                 .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "idempotenceKey")
                 .body(new UrlDTO("http://google"))
                 .when()
                 .post("/")
                 .then()
                 .statusCode(400)
                 .body("message", Is.is("Invalid url"));
+    }
+
+    @Test
+    void requestMakeSameUrlTwiceWithSameIdempotenceKey() {
+        String compactUrl_1 = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "idempotenceKey")
+                .body(new UrlDTO("http://google.com"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .body("url", Matchers.notNullValue())
+                .extract()
+                .body()
+                .jsonPath()
+                .get("url");
+
+        String compactUrl_2 = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "idempotenceKey")
+                .body(new UrlDTO("http://google.com"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .body("url", Matchers.notNullValue())
+                .extract()
+                .body()
+                .jsonPath()
+                .get("url");
+
+        assertEquals(compactUrl_1, compactUrl_2);
+    }
+
+    @Test
+    void requestMakeSameUrlTwiceWithDifferentIdempotenceKey() {
+        String compactUrl_1 = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "key1")
+                .body(new UrlDTO("http://google.com"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .body("url", Matchers.notNullValue())
+                .extract()
+                .body()
+                .jsonPath()
+                .get("url");
+
+        String compactUrl_2 = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "key2")
+                .body(new UrlDTO("http://google.com"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .body("url", Matchers.notNullValue())
+                .extract()
+                .body()
+                .jsonPath()
+                .get("url");
+
+        assertNotEquals(compactUrl_1, compactUrl_2);
+    }
+
+    @Test
+    void requestMakeDifferentUrlWithSameIdempotenceKey() {
+        String compactUrl_1 = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "idempotenceKey")
+                .body(new UrlDTO("http://google.com"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .body("url", Matchers.notNullValue())
+                .extract()
+                .body()
+                .jsonPath()
+                .get("url");
+
+        String compactUrl_2 = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "idempotenceKey")
+                .body(new UrlDTO("http://ya.ru"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(200)
+                .body("url", Matchers.notNullValue())
+                .extract()
+                .body()
+                .jsonPath()
+                .get("url");
+
+        assertNotEquals(compactUrl_1, compactUrl_2);
+    }
+
+    @Test
+    void requestWithEmptyIdempotenceKeyHeader() {
+        given().port(port)
+                .contentType(ContentType.JSON)
+                .header("Idempotence-Key", "")
+                .body(new UrlDTO("http://google"))
+                .when()
+                .post("/")
+                .then()
+                .statusCode(400)
+                .body("message", Is.is("Idempotence-Key header is missing"));
     }
 
 }
