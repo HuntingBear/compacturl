@@ -2,16 +2,15 @@ package ru.testtask.compacturl.util;
 
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class IdGenerator {
-    private static final int MODULO = 1000;
-    AtomicInteger counter = new AtomicInteger();
+    private static final int BOUND = 1000;
 
     public String generate() {
-        final int counterValue = counter.getAndUpdate(operand -> (operand + 1) % MODULO);
-        final long id = System.currentTimeMillis() + counterValue;
+        final int randomValue = ThreadLocalRandom.current().nextInt(0, BOUND);
+        final long id = Long.parseLong("" + randomValue + System.currentTimeMillis());
         return Converter.convert(id);
     }
 }
