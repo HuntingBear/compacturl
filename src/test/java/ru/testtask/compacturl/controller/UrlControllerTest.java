@@ -4,6 +4,7 @@ import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +30,11 @@ class UrlControllerTest {
 
     @Autowired
     private CompactUrlService service;
+
+    @BeforeEach
+    void init() {
+        urlRepository.deleteAll();
+    }
 
     @AfterEach
     void clear() {
@@ -152,6 +158,7 @@ class UrlControllerTest {
         assertNotEquals(compactUrl_1, compactUrl_2);
     }
 
+/*
     @Test
     void requestMakeDifferentUrlWithSameIdempotenceKey() {
         String compactUrl_1 = given()
@@ -186,6 +193,7 @@ class UrlControllerTest {
 
         assertNotEquals(compactUrl_1, compactUrl_2);
     }
+*/
 
     @Test
     void requestWithEmptyIdempotenceKeyHeader() {
