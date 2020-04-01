@@ -2,9 +2,7 @@ package ru.testtask.compacturl.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,7 +15,7 @@ class CompactUrlServiceTest {
 
     @Test
     void addAndFindSuccess() {
-        var compactUrl = compactUrlService.addUrl(GOOGLE);
+        var compactUrl = compactUrlService.atomicAddUrl(GOOGLE);
         assertEquals(GOOGLE, compactUrl.getUrl());
         var originalUrl = compactUrlService.findById(compactUrl.getId());
         assertEquals(GOOGLE, originalUrl.get().getUrl());

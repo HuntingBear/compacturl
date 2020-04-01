@@ -31,7 +31,7 @@ public class UrlController {
     @PostMapping
     public ResponseEntity urlCreation(@RequestBody UrlDTO urlDTO, UriComponentsBuilder builder) {
         if (Validator.isUrlValid(urlDTO.getUrl())) {
-            var compactUrl = service.addUrl(urlDTO.getUrl());
+            var compactUrl = service.atomicAddUrl(urlDTO.getUrl());
             var uri = builder.path("/{id}").buildAndExpand(compactUrl.getId()).toUri();
             UrlDTO compactUrlDTO = new UrlDTO(uri.toString());
             return ResponseEntity.ok(compactUrlDTO);

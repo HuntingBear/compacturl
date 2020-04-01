@@ -43,7 +43,7 @@ class UrlControllerTest {
 
     @Test
     void requestExistingUrl() {
-        Url url = service.addUrl("http://google.com");
+        Url url = service.atomicAddUrl("http://google.com");
 
         expect().statusCode(200)
                 .given()

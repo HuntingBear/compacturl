@@ -6,10 +6,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
 import ru.testtask.compacturl.domain.Url;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface UrlRepository extends MongoRepository<Url, String> {
+public interface UrlRepository extends MongoRepository<Url, String>, UrlRepositoryCustom {
     @RestResource(exported = false)
     @Override
     Page<Url> findAll(Pageable pageable);
@@ -29,6 +28,4 @@ public interface UrlRepository extends MongoRepository<Url, String> {
     @RestResource(exported = false)
     @Override
     void delete(Url url);
-
-    List<Url> findUrlByUrl(String url);
 }
