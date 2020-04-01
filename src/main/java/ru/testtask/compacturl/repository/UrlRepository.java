@@ -9,7 +9,7 @@ import ru.testtask.compacturl.domain.Url;
 import java.util.List;
 import java.util.Optional;
 
-public interface UrlRepository extends MongoRepository<Url, String> {
+public interface UrlRepository extends MongoRepository<Url, String>, UrlRepositoryCustom {
     @RestResource(exported = false)
     @Override
     Page<Url> findAll(Pageable pageable);

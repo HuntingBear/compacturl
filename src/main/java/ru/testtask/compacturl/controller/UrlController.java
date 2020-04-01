@@ -34,7 +34,7 @@ public class UrlController {
             throw new IdempotenceKeyHeaderMissing();
         }
         if (Validator.isUrlValid(urlDTO.getUrl())) {
-            var compactUrl = service.addUrl(urlDTO.getUrl(), idempotenceKey);
+            var compactUrl = service.atomicAddUrl(urlDTO.getUrl(), idempotenceKey);
             var uri = builder.path("/{id}").buildAndExpand(compactUrl.getId()).toUri();
             UrlDTO compactUrlDTO = new UrlDTO(uri.toString());
             return ResponseEntity.ok(compactUrlDTO);

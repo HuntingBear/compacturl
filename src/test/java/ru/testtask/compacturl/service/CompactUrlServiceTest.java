@@ -27,7 +27,7 @@ class CompactUrlServiceTest {
 
     @Test
     void addAndFindSuccess() {
-        var compactUrl = compactUrlService.addUrl(GOOGLE, "idempotenceKey");
+        var compactUrl = compactUrlService.atomicAddUrl(GOOGLE, "idempotenceKey");
         assertEquals(GOOGLE, compactUrl.getUrl());
         var originalUrl = compactUrlService.findById(compactUrl.getId());
         assertEquals(GOOGLE, originalUrl.get().getUrl());
@@ -36,7 +36,7 @@ class CompactUrlServiceTest {
     @Test
     void addUrlsInParallel() throws InterruptedException {
         urlRepository.deleteAll();
-        Runnable newUrl = () -> compactUrlService.addUrl(GOOGLE, "idempotenceKey");
+        Runnable newUrl = () -> compactUrlService.atomicAddUrl(GOOGLE, "idempotenceKey");
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         for (int i = 0; i < URLS_NUMBER; i++) {

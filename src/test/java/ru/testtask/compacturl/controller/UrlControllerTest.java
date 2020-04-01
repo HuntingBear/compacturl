@@ -51,7 +51,7 @@ class UrlControllerTest {
 
     @Test
     void requestExistingUrl() {
-        Url url = service.addUrl("http://google.com", "idempotenceKey");
+        Url url = service.atomicAddUrl("http://google.com", "idempotenceKey");
 
         expect().statusCode(200)
                 .given()
